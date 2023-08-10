@@ -13,7 +13,6 @@ from json import JSONDecodeError
 from typing import Any, List, Optional, Sequence, Tuple, Union
 
 from pydantic import root_validator
-
 from langchain.agents import BaseSingleActionAgent
 from langchain.base_language import BaseLanguageModel
 from langchain.callbacks.base import BaseCallbackManager
@@ -227,10 +226,15 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
         full_inputs = dict(**selected_inputs, agent_scratchpad=agent_scratchpad)
         prompt = self.prompt.format_prompt(**full_inputs)
         messages = prompt.to_messages()
+        # print(messages)
         print(1)
-        predicted_message = await self.llm.apredict_messages(
-            messages, functions=self.functions, callbacks=callbacks
-        )
+        try:
+            predicted_message = await self.llm.apredict_messages(
+                messages, callbacks=callbacks
+            )
+        except Exception as e:
+        # Handle other exceptions
+            print("An unexpected error occurred:", e)
         agent_decision = await _parse_ai_message(predicted_message, self.llm)
         return agent_decision
 

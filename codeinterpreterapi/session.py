@@ -1,3 +1,6 @@
+import openai
+import os
+from dotenv import load_dotenv
 import uuid, base64, re
 from io import BytesIO
 from typing import Optional
@@ -5,6 +8,7 @@ from codeboxapi import CodeBox  # type: ignore
 from codeboxapi.schema import CodeBoxOutput  # type: ignore
 from langchain.tools import StructuredTool
 from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import AzureChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 from langchain.prompts.chat import MessagesPlaceholder
 from langchain.agents import AgentExecutor, BaseSingleActionAgent
@@ -17,6 +21,12 @@ from codeinterpreterapi.prompts import code_interpreter_system_message
 from codeinterpreterapi.callbacks import CodeCallbackHandler
 from codeinterpreterapi.chains.modifications_check import get_file_modifications
 from codeinterpreterapi.chains.remove_download_link import remove_download_link
+
+load_dotenv()
+
+openai.api_type = "azure"
+openai.api_base = os.getenv("OPENAI_ENDPOINT")
+print("session", openai.api_base)
 
 
 class CodeInterpreterSession:
@@ -48,21 +58,26 @@ class CodeInterpreterSession:
 
     def _llm(self, model: Optional[str] = None, openai_api_key: Optional[str] = None) -> BaseChatModel:
         if model is None:
-            model = "gpt-4"
+            model = "gpt-35-turbo-16k"
 
         if openai_api_key is None:
-            if settings.OPENAI_API_KEY is None:
-                raise ValueError("OpenAI API key missing.")
-            else:
-                openai_api_key = settings.OPENAI_API_KEY
+            openai_api_key = os.getenv("OPENAI_API_KEY_BC")
+            print("session", openai_api_key)
 
-        return ChatOpenAI(
-            temperature=0.03,
-            model=model,
-            openai_api_key=openai_api_key,
-            max_retries=3,
-            request_timeout=60 * 3,
-        )  # type: ignore
+        # return ChatOpenAI(
+        #     temperature=0.03,
+        #     model="gpt-3.5-turbo-16k",
+        #     openai_api_key="dde7c8872740453e8e598c3b76760d0f",
+        #     max_retries=5,
+        #     request_timeout=60 * 3,
+        # )  # type: ignore
+    
+        return  AzureChatOpenAI(
+            deployment_name="gpt-35-turbo-16k",
+            openai_api_version="2023-03-15-preview",
+            openai_api_key=os.getenv("OPENAI_API_KEY_BC"),
+            
+                )
 
     def _agent(self) -> BaseSingleActionAgent:
         return OpenAIFunctionsAgent.from_llm_and_tools(

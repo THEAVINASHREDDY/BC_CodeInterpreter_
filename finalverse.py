@@ -10,8 +10,12 @@ import openai
 AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=storageaccount0409;AccountKey=Qd/MmaRrYCpKLrz3Pvt/ZfL21/ir8rzAsFNOu5mCOD8cj02Oxw7Pm64Hn2ItBWhnUi8GJi/UY0jk+AStRZz/NQ==;EndpointSuffix=core.windows.net"
 AZURE_CONTAINER_NAME = "container"
 
+# GPT-4 32k API configuration
+openai.log = None
 openai.api_type = "azure"
 openai.api_version = "2023-03-15-preview"
+openai.api_base = os.getenv("OPENAI_ENDPOINT")
+openai.api_key = os.getenv("OPENAI_KEY")
 
 
 # Function to upload file to Azure Blob Storage
@@ -55,7 +59,7 @@ async def get_images(prompt: str, files: list = None):
         st.write(prompt)
 
     with st.spinner():
-        async with CodeInterpreterSession(model='gpt-3.5-turbo-16k') as session:
+        async with CodeInterpreterSession(model='gpt-4-32k') as session:
             response = await session.generate_response(
                 prompt,
                 files=files
