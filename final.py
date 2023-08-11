@@ -7,7 +7,7 @@ import uuid
 import openai
 
 # Azure Blob Storage credentials
-AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=storageaccount0409;AccountKey=Qd/MmaRrYCpKLrz3Pvt/ZfL21/ir8rzAsFNOu5mCOD8cj02Oxw7Pm64Hn2ItBWhnUi8GJi/UY0jk+AStRZz/NQ==;EndpointSuffix=core.windows.net"
+AZURE_STORAGE_CONNECTION_STRING = "AZURE_CONNECTION_STRING"
 AZURE_CONTAINER_NAME = "container"
 
 openai.api_type = "azure"
